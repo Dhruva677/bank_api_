@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Banking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(138, 43, 226, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 0, 128, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 60% 70%, rgba(0, 255, 0, 0.2) 0%, transparent 50%);
+            animation: gradientShift 15s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(5%, -5%) rotate(120deg); }
+            66% { transform: translate(-5%, 5%) rotate(240deg); }
+        }
+
+        /* Mesh wave effect */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -100px;
+            left: -100px;
+            right: -100px;
+            height: 400px;
+            background: 
+                linear-gradient(90deg, transparent 0%, rgba(138, 43, 226, 0.3) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(0, 255, 255, 0.2) 50%, transparent 100%);
+            filter: blur(40px);
+            animation: wave 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            50% { transform: translateY(-50px) scaleX(1.1); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 10;
+            margin: 20px auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #00ffff 0%, #8a2be2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Glassmorphism card */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.6s ease-out;
+            max-height: none;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            margin-bottom: 10px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            opacity: 0.6;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 45px 15px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            font-size: 15px;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3) 0%, rgba(0, 255, 255, 0.3) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideDown 0.3s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: rgba(255, 50, 50, 0.2);
+            color: #ffaaaa;
+            border: 1px solid rgba(255, 50, 50, 0.4);
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 150, 0.2);
+            color: #aaffcc;
+            border: 1px solid rgba(0, 255, 150, 0.4);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .balance-display {
+            font-size: 56px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ffff 0%, #8a2be2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 10px;
+            animation: balancePop 0.6s ease-out;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        @keyframes balancePop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .balance-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalSlide 0.4s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: 300;
+            color: white;
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .balance-details {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 22px;
+            background: linear-gradient(135deg, #00ffff 0%, #8a2be2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 10px;
+        }
+
+        .balance-row span:first-child {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .balance-row span:last-child {
+            color: white;
+            font-weight: 500;
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .link-text {
+            text-align: center;
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .link-text a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .link-text a:hover {
+            color: #8a2be2;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Celebration Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #00ffff;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00ffff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Remember me checkbox */
+        .checkbox-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-group a {
+            color: #00ffff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .checkbox-group a:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 40px 30px;
+            }
+            
+            .logo {
+                font-size: 30px;
+            }
+            
+            .balance-display {
+                font-size: 42px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="celebration-overlay" id="celebrationOverlay"></div>
+    
+    <div class="container">
+        <div class="logo"><span>KODNEST</span> BANK</div>
+        
+        <!-- Login Page -->
+        <div id="loginPage" class="card">
+            <h1 class="page-title">LOGIN</h1>
+            <p class="page-subtitle">Access your account</p>
+            <div id="loginAlert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Username</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                        <div class="input-icon">👤</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="rememberMe">
+                        Remember me
+                    </label>
+                    <a>Forgot password?</a>
+                </div>
+                <button type="submit" class="btn">LOGIN</button>
+            </form>
+            <div class="link-text">
+                Don't have an account? <a onclick="showRegister()">Create Account</a>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="card hidden">
+            <h1 class="page-title">CREATE ACCOUNT</h1>
+            <p class="page-subtitle">Join Kodnest Bank today</p>
+            <div id="registerAlert"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regName">Full Name</label>
+                    <input type="text" id="regName" required placeholder="Enter your full name">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regMobile">Mobile Number</label>
+                        <input type="tel" id="regMobile" required placeholder="10 digits" pattern="[0-9]{10}">
+                    </div>
+                    <div class="form-group">
+                        <label for="regBalance">Initial Balance</label>
+                        <input type="number" id="regBalance" required placeholder="₹ Amount" min="1000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" required placeholder="Create a password" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" required placeholder="Re-enter password">
+                </div>
+                <button type="submit" class="btn">CREATE ACCOUNT</button>
+            </form>
+            <div class="link-text">
+                Already have an account? <a onclick="showLogin()">Login</a>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="card hidden">
+            <div class="dashboard-header">
+                <div class="welcome-text">Welcome back, <span id="userName"></span>! 🎉</div>
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-display" id="balanceDisplay">₹0</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statMobile">-</div>
+                    <div class="stat-label">Mobile</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">Active</div>
+                    <div class="stat-label">Status</div>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="showBalanceDetails()">VIEW FULL DETAILS</button>
+            <button class="btn btn-outline" onclick="logout()">LOGOUT</button>
+        </div>
+    </div>
+
+    <!-- Balance Details Modal -->
+    <div id="balanceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">💳 ACCOUNT DETAILS</div>
+            <div class="balance-details">
+                <div class="balance-row">
+                    <span>Account Holder</span>
+                    <span id="modalName"></span>
+                </div>
+                <div class="balance-row">
+                    <span>Mobile Number</span>
+                    <span id="modalMobile"></span>
+                </div>
+                <div class="balance-row">
+                    <span>Email Address</span>
+                    <span id="modalEmail"></span>
+                </div>
+                <div class="balance-row">
+                    <span>Account Age</span>
+                    <span id="modalAccountAge"></span>
+                </div>
+                <div class="balance-row">
+                    <span>Available Balance</span>
+                    <span id="modalBalance"></span>
+                </div>
+            </div>
+            <button class="btn btn-close" onclick="closeBalanceModal()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        let db = null;
+        let SQL = null;
+
+        // Initialize SQLite database
+        async function initDatabase() {
+            try {
+                SQL = await initSqlJs({
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                });
+
+                // Try to load existing database from localStorage
+                const savedDb = localStorage.getItem('bankDatabase');
+                if (savedDb) {
+                    const uint8Array = new Uint8Array(JSON.parse(savedDb));
+                    db = new SQL.Database(uint8Array);
+                } else {
+                    db = new SQL.Database();
+                    createTables();
+                    insertDemoUsers();
+                }
+
+                console.log('Database initialized successfully');
+            } catch (error) {
+                console.error('Database initialization error:', error);
+                showAlert('Database initialization failed. Please refresh the page.', 'error');
+            }
+        }
+
+        // Create database tables
+        function createTables() {
+            db.run(`
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    mobile TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    balance REAL NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+
+            db.run(`
+                CREATE TABLE IF NOT EXISTS sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )
+            `);
+
+            saveDatabase();
+        }
+
+        // Insert demo users
+        function insertDemoUsers() {
+            const demoUsers = [
+                ['John Doe', '1234567890', 'john@example.com', btoa('pass123'), 50000],
+                ['Jane Smith', '9876543210', 'jane@example.com', btoa('pass456'), 75000]
+            ];
+
+            demoUsers.forEach(user => {
+                db.run(
+                    'INSERT INTO users (name, mobile, email, password, balance) VALUES (?, ?, ?, ?, ?)',
+                    user
+                );
+            });
+
+            saveDatabase();
+        }
+
+        // Save database to localStorage
+        function saveDatabase() {
+            if (db) {
+                const data = db.export();
+                const buffer = Array.from(data);
+                localStorage.setItem('bankDatabase', JSON.stringify(buffer));
+            }
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'error', elementId = 'loginAlert') {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertDiv.innerHTML = '';
+            }, 4000);
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return '₹' + Number(amount).toLocaleString('en-IN');
+        }
+
+        // Create confetti celebration
+        function celebrate() {
+            const overlay = document.getElementById('celebrationOverlay');
+            const colors = ['#00ffff', '#8a2be2', '#ff00ff', '#00ff00', '#ffff00', '#ff0080'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.boxShadow = `0 0 10px ${colors[Math.floor(Math.random() * colors.length)]}`;
+                    overlay.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // Show register page
+        function showRegister() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+            document.getElementById('dashboardPage').classList.add('hidden');
+        }
+
+        // Show login page
+        function showLogin() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+            localStorage.removeItem('currentUserId');
+        }
+
+        // Register form handler
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('regName').value.trim();
+                const mobile = document.getElementById('regMobile').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                const balance = parseFloat(document.getElementById('regBalance').value);
+
+                // Validation
+                if (!name || !mobile || !email || !password || !balance) {
+                    showAlert('Please fill in all fields', 'error', 'registerAlert');
+                    return;
+                }
+
+                if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
+                    showAlert('Mobile number must be 10 digits', 'error', 'registerAlert');
+                    return;
+                }
+
+                if (balance < 1000) {
+                    showAlert('Minimum initial balance is ₹1,000', 'error', 'registerAlert');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showAlert('Password must be at least 6 characters', 'error', 'registerAlert');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showAlert('Passwords do not match', 'error', 'registerAlert');
+                    return;
+                }
+
+                // Check if email already exists
+                const checkEmail = db.exec('SELECT * FROM users WHERE email = ?', [email]);
+                if (checkEmail.length > 0) {
+                    showAlert('Email already registered', 'error', 'registerAlert');
+                    return;
+                }
+
+                // Insert new user
+                try {
+                    db.run(
+                        'INSERT INTO users (name, mobile, email, password, balance) VALUES (?, ?, ?, ?, ?)',
+                        [name, mobile, email, btoa(password), balance]
+                    );
+                    saveDatabase();
+
+                    showAlert('Account created successfully! Please login.', 'success', 'registerAlert');
+                    
+                    setTimeout(() => {
+                        showLogin();
+                        document.getElementById('loginEmail').value = email;
+                    }, 2000);
+                } catch (error) {
+                    showAlert('Registration failed. Please try again.', 'error', 'registerAlert');
+                    console.error('Registration error:', error);
+                }
+            });
+
+            // Login handler
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+
+                if (!email || !password) {
+                    showAlert('Please fill in all fields');
+                    return;
+                }
+
+                // Query user from database
+                const result = db.exec(
+                    'SELECT * FROM users WHERE email = ? AND password = ?',
+                    [email, btoa(password)]
+                );
+
+                if (result.length > 0 && result[0].values.length > 0) {
+                    const userData = result[0].values[0];
+                    const userId = userData[0];
+
+                    // Store session
+                    localStorage.setItem('currentUserId', userId);
+                    db.run('INSERT INTO sessions (user_id) VALUES (?)', [userId]);
+                    saveDatabase();
+
+                    celebrate();
+                    setTimeout(() => showDashboard(), 300);
+                } else {
+                    showAlert('Invalid credentials');
+                }
+            });
+        });
+
+        // Get current user data
+        function getCurrentUser() {
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) return null;
+
+            const result = db.exec('SELECT * FROM users WHERE id = ?', [userId]);
+            if (result.length > 0 && result[0].values.length > 0) {
+                const userData = result[0].values[0];
+                return {
+                    id: userData[0],
+                    name: userData[1],
+                    mobile: userData[2],
+                    email: userData[3],
+                    password: userData[4],
+                    balance: userData[5],
+                    created_at: userData[6]
+                };
+            }
+            return null;
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            const user = getCurrentUser();
+            
+            if (!user) {
+                showLogin();
+                return;
+            }
+
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('balanceDisplay').textContent = formatCurrency(user.balance);
+            document.getElementById('statMobile').textContent = user.mobile;
+        }
+
+        // Show balance details modal
+        function showBalanceDetails() {
+            const user = getCurrentUser();
+            
+            if (!user) return;
+
+            document.getElementById('modalName').textContent = user.name;
+            document.getElementById('modalMobile').textContent = user.mobile;
+            document.getElementById('modalEmail').textContent = user.email;
+            document.getElementById('modalBalance').textContent = formatCurrency(user.balance);
+            
+            // Get account age
+            const createdDate = new Date(user.created_at);
+            const accountAge = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('modalAccountAge').textContent = accountAge + ' days';
+
+            document.getElementById('balanceModal').classList.add('active');
+        }
+
+        // Close balance modal
+        function closeBalanceModal() {
+            document.getElementById('balanceModal').classList.remove('active');
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentUserId');
+            showLogin();
+        }
+
+        // Check session on load
+        window.addEventListener('load', async function() {
+            await initDatabase();
+            
+            const currentUserId = localStorage.getItem('currentUserId');
+            if (currentUserId && db) {
+                showDashboard();
+            }
+        });
+
+        // Close modal on outside click
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('balanceModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeBalanceModal();
+                }
+            });
+        });
+
+        // Export database for backup (optional feature)
+        function exportDatabase() {
+            if (db) {
+                const data = db.export();
+                const blob = new Blob([data], { type: 'application/x-sqlite3' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'antigravity_bank.db';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+    </script>
+</body>
+</html>
